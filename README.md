@@ -1,0 +1,2 @@
+# Mysql-queries
+Practical queries
