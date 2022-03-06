@@ -27,17 +27,41 @@ WHERE Salary NOT  BETWEEN 1500 AND 2850;
 -- 8. Query to display Employee Name and Department No. of all the employees in Dept 10 and Dept 30 in the alphabetical order by name.
 SELECT Ename , Dno FROM employee
 Where Dno = 10 OR DNo = 30
-order by Ename ASC
+order by Ename ASC;
 
 -- 9. Query to display Name and Hire Date of every Employee who was hired in 1981.
+SELECT Ename , Hire_date from employee
+WHERE Hire_date LIKE '1981%';
+
 -- 10. Query to display Name and Job of all employees who have not assigned a supervisor.
+SELECT Ename , Job_type FROM employee
+WHERE SupervisorEno IS NULL;
+
 -- 11. Query to display the Name, Salary and Commission for all the employees who earn commission.
+SELECT Ename, Salary , Commission FROM employee
+WHERE Commission IS NOT NULL;
+
 -- 12. Sort the data in descending order of Salary and Commission.
+SELECT * FROM employee
+order by Salary, Commission DESC;
+
 -- 13. Query to display Name of all the employees where the third letter of their name is ‘A’.
+SELECT Ename FROM employee
+WHERE Ename Like '__A%';
+
 -- 14. Query to display Name of all employees either have two ‘R’s or have two ‘A’s in their name and are either in Dept No = 30 or their Manger’s Employee No = 7788.
+SELECT Ename FROM employee
+WHERE (Ename like '%R%R%' OR Ename LIKE '%A%A%') AND (Dno = 30 OR SupervisorEno = 7788);
+
 -- 15. Query to display Name, Salary and Commission for all employees whose Commission amount is greater than their Salary increased by 5%.
+SELECT Ename, Salary , Commission FROM employee
+WHERE Commission > (Salary + Salary*0.05);
+
 -- 16. Query to display the Current Date along with the day name.
+SELECT CURDATE() AS DATE , DAYNAME(CURDATE()) AS DAY;
+
 -- 17. Query to display Name, Hire Date and Salary Review Date which is the 1st Monday after six months of employment.
+SELECT Ename , Hire_date , Salary
 -- 18. Query to display Name and calculate the number of months between today and the date on which employee was hired of department ‘Purchase’.
 -- 19. Query to display the following for each employee <E-Name> earns < Salary> monthly but wants < 3 * Current Salary >. Label the Column as Dream Salary.
 -- 20. Query to display Name with the 1st letter capitalized and all other letter lower case and length of their name of all the employees whose name starts with ‘J’, ’A’ and ‘M’.
