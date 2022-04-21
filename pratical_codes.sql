@@ -1,5 +1,5 @@
 desc employee;
-
+use employees;
 -- 1. Query to display Employee Name, Job, Hire Date, Employee Number; for each employee with the Employee Number appearing first.
 SELECT Eno , Ename, Job_type , Hire_date FROM employee;
 
@@ -61,23 +61,97 @@ WHERE Commission > (Salary + Salary*0.05);
 SELECT CURDATE() AS DATE , DAYNAME(CURDATE()) AS DAY;
 
 -- 17. Query to display Name, Hire Date and Salary Review Date which is the 1st Monday after six months of employment.
-SELECT Ename , Hire_date , Salary
+SELECT y.Emp_name as "Name", y.Hiring_date,
+	case
+		when dayname(y.new_date) = "Tuesday" then adddate(y.new_date,interval 6 day)
+        when dayname(y.new_date) = "Wednesday" then adddate(y.new_date,interval 5 day)
+        when dayname(y.new_date) = "Thursday" then adddate(y.new_date,interval 4 day)
+        when dayname(y.new_date) = "Friday" then adddate(y.new_date,interval 3 day)
+        when dayname(y.new_date) = "Saturday" then adddate(y.new_date,interval 2 day)
+        when dayname(y.new_date) = "Sunday" then adddate(y.new_date,interval 1 day)
+        else y.new_date
+	end as Salary_review_date
+    
+    from (
+		SELECT x.Ename as "Emp_name",
+			x.Hire_date as "Hiring_date",
+            adddate(Hire_date, interval 6 month) new_date
+            from(
+				SELECT Ename, Hire_date
+                From employee
+                ) x
+    ) y;
 -- 18. Query to display Name and calculate the number of months between today and the date on which employee was hired of department ‘Purchase’.
+SELECT Ename, timestampdiff(month,Hire_date,sysdate()) "Months"
+FROM employee, department
+WHERE employee.Dno = department.Dno AND Dname= "Purchase";
+
 -- 19. Query to display the following for each employee <E-Name> earns < Salary> monthly but wants < 3 * Current Salary >. Label the Column as Dream Salary.
+SELECT Ename, Salary , 3*Salary as "Dream Salary" from employee;
+
 -- 20. Query to display Name with the 1st letter capitalized and all other letter lower case and length of their name of all the employees whose name starts with ‘J’, ’A’ and ‘M’.
+SELECT concat(SUBSTR(Ename,1,1), LOWER(SUBSTR(Ename,2,Length(Ename)))) as 'Employee Name', length(Ename)
+FROM employee
+WHERE Ename LIKE "J%" OR Ename LIKE "A%" OR Ename LIKE "M%";
+
 -- 21. Query to display Name, Hire Date and Day of the week on which the employee started.
+SELECT Ename, Hire_date, dayname(Hire_date) Day
+FROM employee;
+
 -- 22. Query to display Name, Department Name and Department No for all the employees.
+SELECT employee.Ename, department.Dname, department.Dno
+FROM employee
+left Join department on employee.Dno = department.Dno; 
+
 -- 23. Query to display Unique Listing of all Jobs that are in Department number 30.
+SELECT distinct Job_type
+FROM employee
+Where Dno = 30;
+
 -- 24. Query to display Name, Dept Name of all employees who have an ‘A’ in their name.
+SELECT Ename, department.Dname
+FROM employee
+left JOIN department on employee.Dno = department.Dno
+WHERE Ename LIKE "%A%";
+
 -- 25. Query to display Name, Job, Department No. And Department Name for all the employees working at the Dallas location.
+SELECT Ename, Job_type, department.Dno, department.Dname
+From employee
+LEFT JOIN department on employee.Dno = department.Dno
+WHERE department.Location = "Dallas";
+
 -- 26. Query to display Name and Employee no. Along with their supervisor’s Name and the supervisor’s employee no; along with the Employees’ Name who do not have a supervisor.
+SELECT E.Ename, E.Eno, E.SupervisorEno , S.Ename
+FROM employee E
+Left Join employee S on E.SupervisorEno = S.Eno;
+
 -- 27. Query to display Name, Dept No. And Salary of any employee whose department No. and salary matches both the department no. And the salary of any employee who earns a commission.
+
+
 -- 28. Query to display Name and Salaries represented by asterisks, where each asterisk (*) signifies $100.
+SELECT Ename, lpad("",Salary/100,"*") Salaries FROM employee;
+
 -- 29. Query to display the Highest, Lowest, Sum and Average Salaries of all the employees
+SELECT max(Salary) Highest, min(Salary) Lowest, sum(Salary) Sum, avg(Salary) Average FROM employee;
+
 -- 30. Query to display the number of employees performing the same Job type functions.
+SELECT count(Eno)
+FROM employee
+group by Job_type;
+
 -- 31. Query to display the total number of supervisors without listing their names.
+SELECT COUNT(distinct SupervisorEno)
+From employee;
+
 -- 32. Query to display the Department Name, Location Name, No. of Employees and the average salary for all employees in that department.
+SELECT Dname, Location, count(Eno), avg(Salary)
+From employee
+left join department on employee.Dno = department.Dno
+group by Dname;
+
 -- 33. Query to display Name and Hire Date for all employees in the same dept. as Blake.
+
+
 -- 34. Query to display the Employee No. And Name for all employees who earn more than the average salary.
 -- 35. Query to display Employee Number and Name for all employees who work in a department with any employee whose name contains a ‘T’.
 -- 36. Query to display the names and salaries of all employees who report to supervisor named ‘King’
