@@ -12,7 +12,7 @@ SELECT Eno , Ename, Job_type , Hire_date FROM employee;
 SELECT DISTINCT Job_type FROM employee;
 
 -- 3. Query to display the Employee Name concatenated by a Job separated by a comma.
-Select CONCAT(Ename, "," ,Job_type) AS Profile FROM employee; 
+Select CONCAT(Ename, " , " ,Job_type) AS Profile FROM employee; 
 
 -- 4. Query to display all the data from the Employee Table. Separate each Column by a comma and name the said column as THE_OUTPUT.
 SELECT CONCAT(Eno, ',', Ename , ',' , Job_type , ',' , SupervisorEno , ',' , Hire_date, ',' , Dno, ',' , Commission ,',', Salary) AS THE_OUTPUT FROM employee;
@@ -207,8 +207,8 @@ FROM (
         FROM employee
         GROUP by employee.Dno
 	) c
-    LEFT JOIN department on c.Dno = department.Dno
-    WHERE c.Count >= 20;
+LEFT JOIN department on c.Dno = department.Dno
+WHERE c.Count >= 20;
 
 
 -- 41. Query to find the employee’ name who is not supervisor and name of supervisor supervising more than 5 employees.
@@ -247,7 +247,7 @@ FROM
         Job_Type, COUNT(ENo) AS 'EmpMin'
     FROM
         employee
-    GROUP BY (Job_type)
+    GROUP BY (Job_type) ORDER BY EmpMin ASC
     ) x 
 UNION
 SELECT 
@@ -258,6 +258,6 @@ FROM
         Job_Type, COUNT(ENo) AS 'EmpMax'
     FROM
         employee
-    GROUP BY (Job_type)
+    GROUP BY (Job_type) ORDER BY EmpMax DESC
     ) y;
     
