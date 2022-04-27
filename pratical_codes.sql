@@ -1,5 +1,10 @@
 desc employee;
+desc department;
 use employees;
+
+SELECT * FROM employee;
+SELECT * FROM department;
+
 -- 1. Query to display Employee Name, Job, Hire Date, Employee Number; for each employee with the Employee Number appearing first.
 SELECT Eno , Ename, Job_type , Hire_date FROM employee;
 
@@ -81,6 +86,7 @@ SELECT y.Emp_name as "Name", y.Hiring_date,
                 From employee
                 ) x
     ) y;
+
 -- 18. Query to display Name and calculate the number of months between today and the date on which employee was hired of department ‘Purchase’.
 SELECT Ename, timestampdiff(month,Hire_date,sysdate()) "Months"
 FROM employee, department
@@ -126,7 +132,17 @@ FROM employee E
 Left Join employee S on E.SupervisorEno = S.Eno;
 
 -- 27. Query to display Name, Dept No. And Salary of any employee whose department No. and salary matches both the department no. And the salary of any employee who earns a commission.
-
+SELECT 
+    Ename, Dno, Salary
+FROM
+    EMPLOYEE
+WHERE
+    (Dno , Salary) IN (SELECT 
+            Dno, Salary
+        FROM
+            EMPLOYEE
+        WHERE
+            Commission > 0);
 
 -- 28. Query to display Name and Salaries represented by asterisks, where each asterisk (*) signifies $100.
 SELECT Ename, lpad("",Salary/100,"*") Salaries FROM employee;
@@ -150,14 +166,98 @@ left join department on employee.Dno = department.Dno
 group by Dname;
 
 -- 33. Query to display Name and Hire Date for all employees in the same dept. as Blake.
-
+SELECT Ename, Hire_date
+From employee
+Where Dno = (SELECT Dno FROM employee WHERE Ename = "Blake");
 
 -- 34. Query to display the Employee No. And Name for all employees who earn more than the average salary.
+SELECT Eno, Ename
+From employee
+WHERE Salary > (SELECT avg(Salary) from employee);
+
 -- 35. Query to display Employee Number and Name for all employees who work in a department with any employee whose name contains a ‘T’.
+SELECT Eno, Ename From employee
+WHERE Dno in (SELECT Dno FROM employee WHERE Ename LIKE "%T%");
+
 -- 36. Query to display the names and salaries of all employees who report to supervisor named ‘King’
+SELECT Ename, Salary
+FROM employee
+WHERE SupervisorEno = (SELECT Eno from employee Where Ename = "King");
+
 -- 37. Query to display the department no, name and job for all employees in the Sales department
+SELECT employee.Dno, Ename, Job_type
+FROM employee
+lEFT JOIN department on employee.Dno = department.Dno
+WHERE Dname = "Sales";
+
 -- 38. Display names of employees along with their department name who have more than 20 years experience
+SELECT Ename, department.Dname
+FROM employee, department
+WHERE timestampdiff(year,Hire_date,sysdate()) > 20 AND employee.Dno = department.Dno;
+
 -- 39. Display total number of departments at each location
+SELECT Location, COUNT(distinct Dname) 'No of departments' from department
+group by Location;
+
 -- 40. Find the department name in which at least 20 employees work in.
+SELECT c.Dno as Dno, department.Dname, c.Count 
+FROM (
+		SELECT COUNT(employee.Dno) as Count,
+        employee.Dno as Dno
+        FROM employee
+        GROUP by employee.Dno
+	) c
+    LEFT JOIN department on c.Dno = department.Dno
+    WHERE c.Count >= 20;
+
+
 -- 41. Query to find the employee’ name who is not supervisor and name of supervisor supervising more than 5 employees.
+SELECT 
+    ENAME AS 'Employee Name'
+FROM
+    employee
+WHERE
+    Eno NOT IN (SELECT 
+            SupervisorEno
+        FROM
+            employee
+        WHERE
+            SupervisorEno IS NOT NULL) 
+UNION 
+select ENAME from employee where Eno in  (SELECT 
+    customTable.SupervisorEno
+FROM
+    (SELECT 
+        SupervisorEno, COUNT(Eno) AS 'NoOfEmployee'
+    FROM
+        employee
+    WHERE
+        SupervisorEno IS NOT NULL
+    GROUP BY (SupervisorEno)) customTable
+WHERE
+    customTable.NoOfEmployee > 5);
+
 -- 42. Query to display the job type with maximum and minimum employees
+
+SELECT 
+    x.Job_Type, MIN(x.EmpMin) 'No. Of Employee' 
+FROM
+    (
+    SELECT 
+        Job_Type, COUNT(ENo) AS 'EmpMin'
+    FROM
+        employee
+    GROUP BY (Job_type)
+    ) x 
+UNION
+SELECT 
+    y.Job_Type , MAX(y.EmpMax)
+FROM
+    (
+    SELECT 
+        Job_Type, COUNT(ENo) AS 'EmpMax'
+    FROM
+        employee
+    GROUP BY (Job_type)
+    ) y;
+    
